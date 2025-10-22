@@ -12,6 +12,9 @@ import AttendancePage from "@/components/pages/attendance-page"
 import HomeworkPage from "@/components/pages/homework-page"
 import ProgressPage from "@/components/pages/progress-page"
 import CommunicationPage from "@/components/pages/communication-page"
+import UserManagementPage from "@/components/pages/user-management-page"
+import ClassManagementPage from "@/components/pages/class-management-page"
+import MaterialsPage from "@/components/pages/materials-page"
 
 export default function Dashboard({ user, onLogout }) {
   const [currentPage, setCurrentPage] = useState("dashboard")
@@ -24,12 +27,18 @@ export default function Dashboard({ user, onLogout }) {
         if (user.role === "student") return <StudentDashboard user={user} />
         if (user.role === "parent") return <ParentDashboard user={user} />
         break
+      case "users":
+        return <UserManagementPage user={user} />
+      case "classes":
+        return <ClassManagementPage user={user} />
       case "schedule":
         return <SchedulePage user={user} />
       case "attendance":
         return <AttendancePage user={user} />
       case "homework":
         return <HomeworkPage user={user} />
+      case "materials":
+        return <MaterialsPage user={user} />
       case "progress":
         return <ProgressPage user={user} />
       case "communication":

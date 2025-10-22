@@ -6,10 +6,9 @@ import { BookOpen, LayoutDashboard, Calendar, Users, BookMarked, BarChart3, Mess
 const MENU_ITEMS = {
   admin: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "schedule", label: "Schedule", icon: Calendar },
-    { id: "attendance", label: "Attendance", icon: Users },
-    { id: "homework", label: "Homework", icon: BookMarked },
-    { id: "progress", label: "Progress", icon: BarChart3 },
+    { id: "users", label: "User Management", icon: Users },
+    { id: "classes", label: "Class Management", icon: BookOpen },
+    { id: "materials", label: "Materials", icon: BookMarked },
     { id: "communication", label: "Communication", icon: MessageSquare },
   ],
   teacher: [
@@ -17,6 +16,7 @@ const MENU_ITEMS = {
     { id: "schedule", label: "Schedule", icon: Calendar },
     { id: "attendance", label: "Mark Attendance", icon: Users },
     { id: "homework", label: "Homework", icon: BookMarked },
+    { id: "materials", label: "Materials", icon: BookOpen },
     { id: "progress", label: "Progress", icon: BarChart3 },
     { id: "communication", label: "Communication", icon: MessageSquare },
   ],
@@ -25,13 +25,13 @@ const MENU_ITEMS = {
     { id: "schedule", label: "Schedule", icon: Calendar },
     { id: "attendance", label: "Attendance", icon: Users },
     { id: "homework", label: "Homework", icon: BookMarked },
+    { id: "materials", label: "Materials", icon: BookOpen },
     { id: "progress", label: "Progress", icon: BarChart3 },
   ],
   parent: [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "schedule", label: "Schedule", icon: Calendar },
-    { id: "attendance", label: "Attendance", icon: Users },
-    { id: "progress", label: "Progress", icon: BarChart3 },
+    { id: "materials", label: "Materials", icon: BookOpen },
+    { id: "communication", label: "Communication", icon: MessageSquare },
   ],
 }
 

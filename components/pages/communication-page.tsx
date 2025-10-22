@@ -63,9 +63,38 @@ const DISCUSSIONS = [
 ]
 
 const DIRECT_MESSAGES = [
-  { id: 1, name: "Ms. Sarah", lastMessage: "Great work on your essay!", time: "10:30 AM", unread: false },
-  { id: 2, name: "Mr. John", lastMessage: "Don't forget about the homework...", time: "9:15 AM", unread: true },
-  { id: 3, name: "Emma Wilson", lastMessage: "Want to study together?", time: "Yesterday", unread: false },
+  {
+    id: 1,
+    name: "Ms. Sarah",
+    lastMessage: "John is doing great in class!",
+    time: "10:30 AM",
+    unread: false,
+    role: "teacher",
+  },
+  {
+    id: 2,
+    name: "Mr. John",
+    lastMessage: "Please remind John about the homework...",
+    time: "9:15 AM",
+    unread: true,
+    role: "teacher",
+  },
+  {
+    id: 3,
+    name: "Ms. Emma",
+    lastMessage: "John's speaking skills are improving!",
+    time: "Yesterday",
+    unread: false,
+    role: "teacher",
+  },
+  {
+    id: 4,
+    name: "Emma Wilson",
+    lastMessage: "Want to study together?",
+    time: "Yesterday",
+    unread: false,
+    role: "student",
+  },
 ]
 
 export default function CommunicationPage({ user }) {
@@ -77,6 +106,10 @@ export default function CommunicationPage({ user }) {
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedMessage, setSelectedMessage] = useState(null)
+  const [chatMessages, setChatMessages] = useState([
+    { id: 1, sender: "other", text: "Hi! How is John doing in class?" },
+    { id: 2, sender: "user", text: "He's doing great! Thanks for asking." },
+  ])
 
   const handlePostMessage = () => {
     if (newMessage.trim()) {
@@ -109,53 +142,70 @@ export default function CommunicationPage({ user }) {
     }
   }
 
+  const handleSendMessage = () => {
+    if (newMessage.trim()) {
+      setChatMessages([...chatMessages, { id: chatMessages.length + 1, sender: "user", text: newMessage }])
+      setNewMessage("")
+    }
+  }
+
   const filteredAnnouncements =
     selectedCategory === "all"
       ? announcements.filter((a) => a.title.toLowerCase().includes(searchQuery.toLowerCase()))
       : announcements.filter(
-          (a) => a.category === selectedCategory && a.title.toLowerCase().includes(searchQuery.toLowerCase()),
-        )
+        (a) => a.category === selectedCategory && a.title.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
 
   const filteredDiscussions = discussions.filter((d) => d.title.toLowerCase().includes(searchQuery.toLowerCase()))
 
   const unreadCount = messages.filter((m) => m.unread).length
 
+  const filteredMessages = user.role === "parent" ? messages.filter((m) => m.role === "teacher") : messages
+
   return (
     <div className="p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Communication Board</h1>
-        <p className="text-gray-600 mt-1">Announcements, discussions, and direct messages</p>
+        <p className="text-gray-600 mt-1">
+          {user.role === "parent"
+            ? "Connect with your child's teachers"
+            : "Announcements, discussions, and direct messages"}
+        </p>
       </div>
 
       <div className="flex gap-2 border-b">
-        <Button
-          onClick={() => setActiveTab("announcements")}
-          variant={activeTab === "announcements" ? "default" : "ghost"}
-          className="rounded-none border-b-2"
-        >
-          Announcements
-        </Button>
-        <Button
-          onClick={() => setActiveTab("discussions")}
-          variant={activeTab === "discussions" ? "default" : "ghost"}
-          className="rounded-none border-b-2"
-        >
-          Discussions
-        </Button>
+        {user.role !== "parent" && (
+          <>
+            <Button
+              onClick={() => setActiveTab("announcements")}
+              variant={activeTab === "announcements" ? "default" : "ghost"}
+              className="rounded-none border-b-2"
+            >
+              Announcements
+            </Button>
+            <Button
+              onClick={() => setActiveTab("discussions")}
+              variant={activeTab === "discussions" ? "default" : "ghost"}
+              className="rounded-none border-b-2"
+            >
+              Discussions
+            </Button>
+          </>
+        )}
         <Button
           onClick={() => setActiveTab("messages")}
           variant={activeTab === "messages" ? "default" : "ghost"}
           className="rounded-none border-b-2 gap-2"
         >
           <MessageCircle className="w-4 h-4" />
-          Messages{" "}
+          {user.role === "parent" ? "Teachers" : "Messages"}
           {unreadCount > 0 && (
             <span className="bg-red-600 text-white text-xs px-2 py-0.5 rounded-full">{unreadCount}</span>
           )}
         </Button>
       </div>
 
-      {activeTab === "announcements" && (
+      {activeTab === "announcements" && user.role !== "parent" && (
         <div className="space-y-6">
           {user.role !== "parent" && (
             <Card>
@@ -231,9 +281,8 @@ export default function CommunicationPage({ user }) {
                         <div className="flex items-center gap-2">
                           <p className="font-semibold text-gray-900">{item.title}</p>
                           <span
-                            className={`text-xs px-2 py-1 rounded-full ${
-                              item.type === "announcement" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"
-                            }`}
+                            className={`text-xs px-2 py-1 rounded-full ${item.type === "announcement" ? "bg-blue-100 text-blue-700" : "bg-green-100 text-green-700"
+                              }`}
                           >
                             {item.type}
                           </span>
@@ -251,7 +300,7 @@ export default function CommunicationPage({ user }) {
         </div>
       )}
 
-      {activeTab === "discussions" && (
+      {activeTab === "discussions" && user.role !== "parent" && (
         <div className="space-y-6">
           <Card>
             <CardHeader>
@@ -308,19 +357,18 @@ export default function CommunicationPage({ user }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="md:col-span-1">
             <CardHeader>
-              <CardTitle>Direct Messages</CardTitle>
+              <CardTitle>{user.role === "parent" ? "Teachers" : "Direct Messages"}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {messages.map((msg) => (
+                {filteredMessages.map((msg) => (
                   <div
                     key={msg.id}
                     onClick={() => setSelectedMessage(msg.id)}
-                    className={`p-3 rounded-lg cursor-pointer transition ${
-                      selectedMessage === msg.id
+                    className={`p-3 rounded-lg cursor-pointer transition ${selectedMessage === msg.id
                         ? "bg-blue-100 border border-blue-300"
                         : "hover:bg-gray-100 border border-transparent"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between">
                       <p className="font-medium text-gray-900">{msg.name}</p>
@@ -337,31 +385,36 @@ export default function CommunicationPage({ user }) {
           <Card className="md:col-span-2">
             <CardHeader>
               <CardTitle>
-                {selectedMessage ? messages.find((m) => m.id === selectedMessage)?.name : "Select a conversation"}
+                {selectedMessage
+                  ? filteredMessages.find((m) => m.id === selectedMessage)?.name
+                  : "Select a conversation"}
               </CardTitle>
             </CardHeader>
             <CardContent>
               {selectedMessage ? (
                 <div className="space-y-4">
                   <div className="h-64 bg-gray-50 rounded-lg p-4 overflow-y-auto space-y-3">
-                    <div className="flex justify-start">
-                      <div className="bg-gray-200 p-3 rounded-lg max-w-xs">
-                        <p className="text-sm text-gray-900">Hi! How are you doing?</p>
+                    {chatMessages.map((msg) => (
+                      <div key={msg.id} className={`flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
+                        <div
+                          className={`p-3 rounded-lg max-w-xs ${msg.sender === "user" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-900"
+                            }`}
+                        >
+                          <p className="text-sm">{msg.text}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex justify-end">
-                      <div className="bg-blue-600 p-3 rounded-lg max-w-xs">
-                        <p className="text-sm text-white">I'm doing great! How about you?</p>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                   <div className="flex gap-2">
                     <input
                       type="text"
                       placeholder="Type a message..."
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
                       className="flex-1 p-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                    <Button className="gap-2">
+                    <Button onClick={handleSendMessage} className="gap-2">
                       <Send className="w-4 h-4" />
                       Send
                     </Button>
